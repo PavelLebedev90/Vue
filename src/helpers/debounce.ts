@@ -1,9 +1,11 @@
 export const debounced = (callback: (...args: any[]) => void, ms: number) => {
   let timerId: any
-  return () => {
-    if (timerId) {
+  let prevField = '';
+  return (validateField: 'count' | 'email') => {
+    if (timerId && prevField === validateField) {
       clearTimeout(timerId)
     }
-    timerId = setTimeout(callback, ms)
+    prevField = validateField
+    timerId = setTimeout(()=>callback(validateField), ms)
   }
 }

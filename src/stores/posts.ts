@@ -6,6 +6,7 @@ export interface IPost {
   description: string
   access: IAccess
   count: number | string
+  email: string
 }
 export const posts = reactive<IPost[]>([])
 const postId = ref(0)

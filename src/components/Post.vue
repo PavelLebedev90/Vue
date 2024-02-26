@@ -40,6 +40,7 @@ const updatePost = (newPost: Omit<IPost, 'id'>) => {
       <p>Доступ: {{ post.access }}</p>
       <p v-show="post.description">Описание: {{ post.description }}</p>
       <p>Количество: {{ post.count }}</p>
+      <p>Почта: {{ post.email }}</p>
     </div>
     <PostForm
       @updatePost="updatePost"
