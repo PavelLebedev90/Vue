@@ -1,5 +1,5 @@
 <template>
-  <button v-bind:class="btnType">
+  <button :class="btnType" :disabled="disabled">
     <slot>Кнопка</slot>
   </button>
 </template>
@@ -11,6 +11,7 @@ export default {
 <script setup lang="ts">
 interface IProp {
   btnType?: 'default' | 'success' | 'danger'
+  disabled?: boolean
 }
 withDefaults(defineProps<IProp>(), {
   btnType: 'default'
@@ -24,6 +25,15 @@ button {
   transition: 0.3s;
   cursor: pointer;
   border-radius: 4px;
+  &:disabled {
+    opacity: 0.3;
+    color: black;
+    border-color: black;
+    cursor: auto;
+    &:hover {
+      background-color: rgb(241, 230, 230);
+    }
+  }
 }
 .default {
   border: 2px solid rgb(124, 139, 182);

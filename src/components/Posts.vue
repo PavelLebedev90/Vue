@@ -12,9 +12,6 @@ const access = ref('all')
 const props = withDefaults(defineProps<IProp>(), {
   posts: () => []
 })
-const emits = defineEmits<{
-  (e: 'deletePost', postId: number, postIndex: number): void
-}>()
 const filterOptions = computed(() => {
   return [{ value: 'all', title: 'все' }, ...accessOptions]
 })
@@ -38,7 +35,7 @@ const filteredPosts = computed(() => {
         v-for="(post, index) of filteredPosts"
         :key="post.id"
         :post="post"
-        @deletePost="emits('deletePost', post.id, index)"
+        :post-index="index"
       />
     </ul>
     <my-button @click="router.push('/create_post')" btnType="danger" v-else
