@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { IPost } from '@/stores/posts'
 import Post from '../components/Post.vue'
+import EditPostItem from '../components/EditPostItem.vue'
 import { useRouter } from 'vue-router'
 import { ref, computed } from 'vue'
 import { accessOptions } from '@/constant/accessOptions'
@@ -31,12 +32,12 @@ const filteredPosts = computed(() => {
       <my-select v-model="access" :options="filterOptions" />
     </div>
     <ul class="list" v-if="filteredPosts.length > 0">
-      <Post
-        v-for="(post, index) of filteredPosts"
-        :key="post.id"
-        :post="post"
-        :post-index="index"
-      />
+      <Post v-for="(post, index) of filteredPosts" :key="post.id" :post="post" :post-index="index">
+        <template #[post.mode]>
+          <EditPostItem :post="post">
+          </EditPostItem>
+        </template>
+      </Post>
     </ul>
     <my-button @click="router.push('/create_post')" btnType="danger" v-else
       >Перейти к созданию</my-button

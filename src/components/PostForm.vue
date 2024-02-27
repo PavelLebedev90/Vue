@@ -6,13 +6,12 @@ import { accessOptions } from '@/constant/accessOptions'
 import { COUNT_REGEXP, EMAIL_REGEXP } from '@/constant/regExp'
 import { debounced } from '@/helpers/debounce'
 interface IProp {
-  isDefaultMode: boolean
   initValue?: IPost
 }
 const store = useStore()
 
 const router = useRouter()
-const { isDefaultMode, initValue } = defineProps<IProp>()
+const { initValue } = defineProps<IProp>()
 const emits = defineEmits<{
   (e: 'changeMode'): void
   (e: 'updatePost', newPost: Omit<IPost, 'id'>): void
@@ -23,7 +22,8 @@ const newPost = reactive<Omit<IPost, 'id'>>({
   description: initValue?.description ?? '',
   access: initValue?.access ?? 'user',
   count: initValue?.count.toString() ?? '0',
-  email: initValue?.email ?? ''
+  email: initValue?.email ?? '',
+  mode: 'default'
 })
 const errorMessage = reactive({
   count: '',
@@ -31,11 +31,7 @@ const errorMessage = reactive({
   formError: ''
 })
 const goBack = () => {
-  if (isDefaultMode) {
-    window.history.length > 2 ? router.back() : router.replace('/')
-  } else {
-    emits('changeMode')
-  }
+  window.history.length > 2 ? router.back() : router.replace('/')
 }
 const clearForm = () => {
   newPost.description = ''
@@ -46,16 +42,12 @@ const clearForm = () => {
 }
 
 const createPostHandler = () => {
-  if (isDefaultMode) {
-    const сoncurrenceEmail = store.posts.find((el) => el.email === newPost.email)
-    if (сoncurrenceEmail) {
-      errorMessage.formError = 'посты должны иметь уникальные emails'
-      return
-    }
-    store.addPost({ ...newPost, count: Number(newPost.count) })
-  } else {
-    emits('updatePost', newPost)
+  const сoncurrenceEmail = store.posts.find((el) => el.email === newPost.email)
+  if (сoncurrenceEmail) {
+    errorMessage.formError = 'посты должны иметь уникальные emails'
+    return
   }
+  store.addPost({ ...newPost, count: Number(newPost.count) })
   clearForm()
 }
 
@@ -95,7 +87,7 @@ watch(
     errorMessage.formError = ''
   },
   {
-    deep: true,
+    deep: true
   }
 )
 const isDisabled = computed(() => {
@@ -120,13 +112,11 @@ const isDisabled = computed(() => {
     <my-select v-model="newPost.access" :options="accessOptions" />
     <p v-show="errorMessage.formError" class="form_error">{{ errorMessage.formError }}</p>
     <div class="btn_container">
-      <my-button @click="goBack" btnType="danger">{{
-        isDefaultMode ? 'Назад' : 'Отменить'
-      }}</my-button>
+      <my-button @click="goBack" btnType="danger">{{ 'Назад' }}</my-button>
       <div>
         <my-button @click="clearForm" class="clear_btn">Очистить</my-button>
         <my-button @click="createPostHandler" btnType="success" :disabled="isDisabled">{{
-          isDefaultMode ? 'Создать' : 'Применить'
+          'Создать'
         }}</my-button>
       </div>
     </div>

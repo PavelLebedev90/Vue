@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IPost } from '@/stores/posts'
+import { IMode, IPost } from '@/stores/posts'
 import { computed, ref } from 'vue'
 import PostForm from '@/components/PostForm.vue'
 import useStore from '@/stores/posts'
@@ -9,51 +9,51 @@ interface IProp {
 }
 const props = defineProps<IProp>()
 
-const { editPost, deletePost } = useStore()
-const mode = ref<'default' | 'edit'>('default')
+const { deletePost, changePostMode } = useStore()
 const deleteHandler = () => {
   deletePost(props.postIndex)
 }
-const isDefaultMode = computed(() => {
-  return mode.value === 'default'
-})
 
-const changeMode = () => {
-  mode.value = mode.value === 'default' ? 'edit' : 'default'
+const changeMode = (mode: IMode) => {
+  changePostMode(props.post.id, mode)
 }
-const updatePost = (newPost: Omit<IPost, 'id'>) => {
-  editPost(
-    {
-      ...newPost,
-      id: props.post.id
-    },
-    props.postIndex
-  )
-  changeMode()
-}
+const disabledDeleteBtn = computed(() => {
+  return props.post.access !== 'admin' || props.post.mode?.includes('edit')
+})
 </script>
 
 <template>
   <li class="list_item">
-    <div v-if="isDefaultMode">
-      <h3 class="item_title">{{ post.title }}</h3>
-      <p>Доступ: {{ post.access }}</p>
-      <p v-show="post.description">Описание: {{ post.description }}</p>
-      <p>Количество: {{ post.count }}</p>
-      <p>Почта: {{ post.email }}</p>
+    <div>
+      <h3 @dblclick="changeMode('title_edit')">
+        <span> Название: </span>
+        <slot name="title_edit">
+          <span class="item_title">
+            {{ post.title }}
+          </span>
+        </slot>
+      </h3>
+      <p @dblclick="changeMode('access_edit')">
+        Доступ:
+        <slot name="access_edit"> {{ post.access }} </slot>
+      </p>
+      <p @dblclick="changeMode('description_edit')" v-show="post.description">
+        Описание:
+        <slot name="description_edit"> {{ post.description }} </slot>
+      </p>
+      <p @dblclick="changeMode('count_edit')">
+        Количество:
+        <slot name="count_edit"> {{ post.count }} </slot>
+      </p>
+      <p @dblclick="changeMode('email_edit')">
+        Почта:
+        <slot name="email_edit"> {{ post.email }} </slot>
+      </p>
     </div>
-    <PostForm
-      @updatePost="updatePost"
-      :initValue="post"
-      :isDefaultMode="isDefaultMode"
-      @changeMode="changeMode"
-      v-if="!isDefaultMode"
-    />
-    <div class="btn_container" v-if="isDefaultMode">
-      <my-button btnType="danger" @click="deleteHandler" :disabled="post.access !== 'admin'"
+    <div class="btn_container">
+      <my-button btnType="danger" @click="deleteHandler" :disabled="disabledDeleteBtn"
         >Удалить</my-button
       >
-      <my-button btnType="default" @click="changeMode">Редактировать</my-button>
     </div>
   </li>
 </template>

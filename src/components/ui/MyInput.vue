@@ -20,7 +20,7 @@ export default {
 }
 </script>
 <template>
-  <div class="container">
+  <span class="container">
     <input
       class="input"
       :class="{ errorInput: !!props.validateError }"
@@ -30,7 +30,7 @@ export default {
       :placeholder="placeholder"
     />
     <span class="error">{{ props.validateError }}</span>
-  </div>
+  </span>
 </template>
 <style lang="scss" scoped>
 .container {
